@@ -1,0 +1,31 @@
+# nodeJS dependencies
+node_modules/
+
+# compiled JS
+*.js
+
+# npm logs
+npm-debug.log*
+npm.tar.gz
+
+# yarn
+.yarn-meta
+yarn-error.log*
+yarn-debug.log*
+
+# vsts
+*.vsix
+.taskkey
+
+# package
+/package
+
+# tests
+/tasks/scan/tests/_temp
+/tasks/scan/tests/*.log
+
+# other
+/.env
+/incubator
+/TASKS.md
+

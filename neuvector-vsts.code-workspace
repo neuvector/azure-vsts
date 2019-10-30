@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"cSpell.language": "en",
+		"cSpell.enabled": false,
+		"explorer.autoReveal": false,
+		"scm.alwaysShowProviders": false,
+		"git.enabled": false,
+		"git.autoRepositoryDetection": false
+	}
+}

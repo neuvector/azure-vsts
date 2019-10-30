@@ -1,0 +1,23 @@
+{
+    "name": "neuvector-vsts-dev",
+    // Use a prebuilt image (instead of dockerFile)
+    "image": "neuvector-vsts:latest",
+    // dockerFile currently does not support experimental build techniques
+    //"dockerFile": "./../Dockerfile",
+    "runArgs": [
+		// Visual Studio Code extensions
+		// - "neuvector-vsts-dev-vscode-server" is the name of the Docker volume which will contain the vscode extensions
+		// - To fully reset the vscode extensions, run "docker volume rm neuvector-vsts-dev-vscode-server"
+		// https://code.visualstudio.com/docs/remote/containers-advanced#_avoiding-extension-reinstalls-on-container-rebuild
+        "--volume", "neuvector-vsts-dev-vscode-server:/root/.vscode-server",
+        // Yarn cache
+        "--mount", "source=neuvector-vsts-yarn,target=/usr/local/share/.cache/yarn",
+        // Node modules
+        // TODO placeholder for workspace path in container
+		"--mount", "source=neuvector-vsts-node-modules,target=/workspaces/azure-devops/tasks/scan/node_modules"
+    ],
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+    }
+    //"postCreateCommand": "yarn install",
+}
