@@ -20,6 +20,7 @@ RUN --mount=type=cache,id=neuvector-vsts-apt-cache,target=/var/cache/apt set -eu
         git \
         procps \
         jq \
+        rsync \
     ;
 
 # Node packages

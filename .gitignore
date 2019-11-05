@@ -17,11 +17,14 @@ yarn-debug.log*
 *.vsix
 .taskkey
 
+# dist
+/dist
+
 # package
 /package
 
 # tests
-/tasks/scan/tests/_temp
+/tasks/scan/tests/_temp*
 /tasks/scan/tests/*.log
 
 # other

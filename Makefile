@@ -2,16 +2,20 @@ PROJECT_PATH := $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 PACKAGE_PATH = $(PROJECT_PATH)/package
 
+DIST_PATH = $(PROJECT_PATH)/dist
+
 IMAGE_NAME = neuvector-vsts
 
 IMAGE_TAG = latest
 
 IMAGE_BUILD_ARGS = 
-	#--no-cache
+#	--no-cache
 
 # Extension meta data
 
 EXTENSION_MANIFEST_PATH = $(PROJECT_PATH)/vss-extension.json
+
+EXTENSION_MANIFEST_DIST_PATH = $(DIST_PATH)/vss-extension.json
 
 EXTENSION_ID = $(shell jq --raw-output '.id' $(EXTENSION_MANIFEST_PATH))
 
@@ -68,7 +72,8 @@ continuous-build:
 .PHONY: test
 test: build
 	cd $(PROJECT_PATH)/tasks/scan/tests && rm *.js.log || true
-	cd $(PROJECT_PATH)/tasks/scan && TASK_TEST_TRACE=1 mocha tests/_suite.js
+#	cd $(PROJECT_PATH)/tasks/scan && TASK_TEST_TRACE=1 mocha --grep 'Scan on local NeuVector controller' tests/_suite.js
+	cd $(PROJECT_PATH)/tasks/scan && TASK_TEST_TRACE=1 mocha --grep 'Scan on external NeuVector controller' tests/_suite.js
 
 # .PHONY: verify
 # verify:
@@ -77,25 +82,41 @@ test: build
 test-package:
 	echo "Not implemented"
 
+DIST_INCLUDE_PATTERNS = \
+	/vss-extension.json \
+	/overview.md \
+	/license.md \
+	/images \
+	/images/*.png \
+	/screenshots \
+	/screenshots/*.png \
+	/tasks \
+	/tasks/scan \
+	/tasks/scan/*.js \
+	/tasks/scan/icon.png \
+	/tasks/scan/icon.svg \
+	/tasks/scan/task.json \
+	/tasks/scan/node_modules \
+	/tasks/scan/node_modules/**
+
+.PHONY: dist
+dist: build
+	mkdir -p $(DIST_PATH)
+	rsync -ravh --delete $(foreach include_pattern,$(DIST_INCLUDE_PATTERNS),--include='$(include_pattern)') --exclude='**' $(PROJECT_PATH)/ $(DIST_PATH)
+
 EXTENSION_PACKAGE_PATH = package/$(EXTENSION_PUBLISHER).$(EXTENSION_ID)-$(EXTENSION_VERSION).vsix
 
 # tfx extension create --help
-$(EXTENSION_PACKAGE_PATH): build
+$(EXTENSION_PACKAGE_PATH): dist
 	mkdir -p $(PACKAGE_PATH)
-	tfx extension create --manifests $(EXTENSION_MANIFEST_PATH) --output-path $(PACKAGE_PATH)
+	cd $(dir $(EXTENSION_MANIFEST_DIST_PATH)) && tfx extension create --manifests $(EXTENSION_MANIFEST_DIST_PATH) --output-path $(PACKAGE_PATH)
 
 .PHONY: package
 package: $(EXTENSION_PACKAGE_PATH)
 
-# TODO create test package
-
-# TODO run extension tests before publish
-
-# TODO implement test-publish
-
 # tfx extension publish --help
 .PHONY: publish
-publish: package
+publish: $(EXTENSION_PACKAGE_PATH)
 ifneq ($(AZURE_DEVOPS_TOKEN),)
 	tfx extension publish --vsix $(PROJECT_PATH)/$(EXTENSION_PACKAGE_PATH) --auth-type pat --token $(AZURE_DEVOPS_TOKEN)
 else
@@ -105,9 +126,9 @@ endif
 .PHONY: package-publish
 package-publish:
 ifneq ($(AZURE_DEVOPS_TOKEN),)
-	tfx extension publish --manifests $(PROJECT_PATH)/vss-extension.json --auth-type pat --token $(AZURE_DEVOPS_TOKEN)
+	tfx extension publish --manifests $(EXTENSION_MANIFEST_DIST_PATH) --auth-type pat --token $(AZURE_DEVOPS_TOKEN)
 else
-	tfx extension publish --manifests $(PROJECT_PATH)/vss-extension.json
+	tfx extension publish --manifests $(EXTENSION_MANIFEST_DIST_PATH)
 endif
 
 # tfx extension share --help
