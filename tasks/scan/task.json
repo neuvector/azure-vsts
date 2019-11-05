@@ -10,10 +10,15 @@
     "version": {
         "Major": 0,
         "Minor": 0,
-        "Patch": 4
+        "Patch": 7
     },
     "instanceNameFormat": "Scan image",
     "groups": [
+        {
+            "name": "image",
+            "displayName": "Image",
+            "isExpanded": true
+        },
         {
             "name": "highSeverityThreshold",
             "displayName": "High severity threshold",
@@ -37,23 +42,57 @@
     ],
     "inputs": [
         {
+            "name": "controllerType",
+            "type": "radio",
+            "label": "Scan image on",
+            "required": true,
+            "defaultValue": "external",
+            "helpMarkDown": "",
+            "options": {
+                "external": "external NeuVector controller",
+                "local": "local NeuVector controller in build pipeline"
+            }
+        },
+        {
             "name": "neuvectorController",
             "type": "connectedService:neuvectorController",
             "label": "NeuVector controller",
-            "required": true,
+            "required": false,
+            "visibleRule": "controllerType = external",
             "helpMarkDown": "Select the service endpoint of the NeuVector Controller which will perform the scan. To create an endpoint, click the Manage link and create a new NeuVector controller service endpoint."
+        },
+        {
+            "name": "controllerLicense",
+            "type": "string",
+            "label": "Controller license",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "controllerType = local",
+            "helpMarkDown": "Path to the license file to apply to the local NeuVector controller. Example: `$(Agent.TempDirectory)/neuvector-license.txt`."
+        },
+        {
+            "name": "controllerPort",
+            "type": "string",
+            "label": "Controller port",
+            "defaultValue": "10443",
+            "required": false,
+            "visibleRule": "controllerType = local",
+            "helpMarkDown": "Provide the port of the NeuVector controller service container."
         },
         {
             "name": "containerRegistry",
             "type": "connectedService:dockerregistry",
             "label": "Container registry",
+            "groupName": "image",
+            "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Select a Docker registry service connection which contains the image to scan."
+            "helpMarkDown": "Select a Docker registry service connection which contains the image to scan. If no container registry is provided, the controller scans only local images."
         },
         {
             "name": "repository",
             "type": "string",
             "label": "Repository",
+            "groupName": "image",
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Repository to scan"
@@ -62,6 +101,7 @@
             "name": "tag",
             "type": "string",
             "label": "Tag",
+            "groupName": "image",
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Tag of the image to scan."

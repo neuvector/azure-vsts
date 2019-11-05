@@ -4,7 +4,7 @@ import * as tl from 'azure-pipelines-task-lib/task';
 
 export function ensureDirExists(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath);
+    fs.mkdirSync(dirPath);
   }
 }
 
@@ -43,4 +43,10 @@ export function uploadBuildSummary(summaryPath: string, title: string): void {
     },
     summaryPath
   );
+}
+
+export function delay(delayMs: number) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, delayMs);
+  });
 }
