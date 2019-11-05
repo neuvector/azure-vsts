@@ -4,16 +4,12 @@ This project provides the NeuVector extension for Azure DevOps Services.
 
 ## Contents
 
-### Task: NeuVectorScan
-
-
-The extension provides the following Azure Pipelines tasks.
-
-### Service Endpoint: NeuVector Controller
+- Task: NeuVectorScan
+- Service Endpoint: NeuVector Controller
 
 ## Development requirements
 
-The following prerequisite compontents must be installed on a development workstations.
+The following prerequisite components must be installed on a development workstations.
 
 - Docker
 - Make
@@ -57,15 +53,12 @@ make test
 make package
 ```
 
-The extension will be saved as a `.vsi` file to the folder `package`.
+The extension will be saved as a `.vsix` file in the folder `package`.
 
 ## Publish
 
-- To publish the extension 
-
-```
-AZURE_DEVOPS_TOKEN
-```
+- To publish the extension to the Visual Studio Marketplace, provide an access token in the environment variable `AZURE_DEVOPS_TOKEN`
+- Publish requires `Contributor` permissions for the NeuVector publisher on the Visual Studio Marketplace
 
 ```
 make publish

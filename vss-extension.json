@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "neuvector-vsts",
     "name": "NeuVector",
-    "version": "0.0.4",
+    "version": "0.0.8",
     "publisher": "NeuVector",
     "targets": [
         {
@@ -36,6 +36,10 @@
             "uri": "https://neuvector.com/about/contact"
         }
     },
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/neuvector/azure-vsts"
+    },
     "tags": [
         "neuvector",
         "security"
@@ -46,6 +50,10 @@
     "files": [
         {
             "path": "tasks/scan"
+        },
+        {
+          "path": "screenshots",
+          "addressable": true
         }
     ],
     "contributions": [
