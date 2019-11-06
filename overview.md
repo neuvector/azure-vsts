@@ -46,7 +46,7 @@ The extension provides the following features:
 The **Scan image with NeuVector** task allows to define quality gates and thresholds for a successful build based on the scan results.
 
 * Fail on reaching as threshold of the number of detected medium and high severity vulnerabilities
-* Fail on the detectionof explicit CVEs
+* Fail on the detection of explicit CVEs
 
 ![NeuVector vulnerability quality gates and thresholds](screenshots/task-thresholds.png)
 
@@ -60,6 +60,87 @@ The **Scan image with NeuVector** task allows to define quality gates and thresh
 
 ## Getting started
 
+### Scan an image in the pipeline on a local controller
+
+The following example shows a YAML-based pipeline, which
+
+* Builds a Docker image `backend`
+* Scans the Docker image after the build for vulnerabilities
+* Fails the build if the image contains at least 1 high severity vulnerability or at least 3 medium severity vulnerabilities
+* Pushes the Docker image to a private Azure Container registry only if the aforementioned quality gates are met
+
+The pipeline starts a NeuVector controller as a [service container](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/service-containers?view=azure-devops&tabs=yaml). The task `NeuVectorScan` connects to the NeuVector controller running in the service container to perform scanning. As a prerequisite, a valid NeuVector license needs to be applied. In the example, the license is taken from the [secure file](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops) `neuvector-license.txt` and referenced by the `NeuVectorScan` step.
+
+The example assumes:
+
+* A [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml) `Docker Hub` is configured with credentials and permissions to fetch images from the NeuVector registry.
+* A valid NeuVector license exists in the [secure file](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops) `neuvector-license.txt` and is accessible by the pipeline.
+* A service connection to an Azure Container Registry `gallery.azurecr.io` is configured.
+
+Example:
+
+```yaml
+services:
+  neuvector: neuvector
+
+steps:
+- task: Docker@2
+  displayName: Build image
+  inputs:
+      command: build
+      Dockerfile: Backend/Dockerfile
+      buildContext: '**'
+      repository: 'backend'
+      tags: '$(Build.BuildId)'
+      addPipelineData: false
+- task: DownloadSecureFile@1
+  name: neuvectorLicense
+  displayName: Get NeuVector license
+  inputs:
+    secureFile: 'neuvector-license.txt'
+- task: NeuVectorScan@1
+  displayName: Scan image with NeuVector
+  inputs:
+    controllerType: local
+    controllerPort: 10443
+    controllerLicense: '$(neuvectorLicense.secureFilePath)'
+    repository: 'backend'
+    tags: '$(Build.BuildId)'
+    failOnHighSeverityThreshold: true
+    highSeverityThreshold: '1'
+    failOnMediumSeverityThreshold: true
+    mediumSeverityThreshold: '3'
+- script: |
+    docker tag backend:$(Build.BuildId) gallery.azurecr.io/backend:$(Build.BuildId)
+  displayName: Tag for private registry
+- task: Docker@2
+  displayName: Push to private registry
+  inputs:
+    command: push
+    containerRegistry: 'gallery.azurecr.io'
+    repository: 'backend'
+    tags: '$(Build.BuildId)'
+
+resources:
+  containers:
+  - container: neuvector
+    image: neuvector/controller:3.0.0.b3
+    endpoint: 'Docker Hub'
+    ports:
+      - 18300:18300
+      - 18301:18301
+      - 18400:18400
+      - 18401:18401
+      - 10443:10443
+    volumes:
+      - /lib/modules:/lib/modules
+      - /var/neuvector:/var/neuvector
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /sys/fs/cgroup:/host/cgroup
+      - /proc:/host/proc
+    options: --pid=host --cap-add=SYS_ADMIN --cap-add=NET_ADMIN --cap-add=SYS_PTRACE --cap-add=IPC_LOCK --security-opt apparmor:unconfined --env CLUSTER_JOIN_ADDR=neuvector --env CTRL_SERVER_PORT=10443
+```
+
 ### Scan an image on an external NeuVector controller
 
 1. Configure the connection parameters and credentials of the NeuVector controller in a service connection
@@ -71,18 +152,17 @@ The **Scan image with NeuVector** task allows to define quality gates and thresh
 
 2. Add the **Scan image with NeuVector** task to your pipeline.
 
-    * The following shows a configuration of the `NeuVectorScan` task which scans the image `library/alpine` in Dockerhub on the NeuVector controller defined by the service connection with the name `NeuVector on AKS`.
+    * The following shows a configuration of the `NeuVectorScan` task which scans the image `library/alpine` in Docker Hub on the NeuVector controller defined by the service connection with the name `NeuVector on AKS`.
 
 Example:
 
 ```yaml
 - task: NeuVectorScan@1
   displayName: Scan image with NeuVector
-  enabled: true
   inputs:
     controllerType: external
     neuvectorController: 'NeuVector on AKS'
-    containerRegistry: 'Dockerhub'
+    containerRegistry: 'Docker Hub'
     repository: 'library/alpine'
     tag: 'latest'
     failOnHighSeverityThreshold: false
@@ -91,4 +171,3 @@ Example:
     mediumSeverityThreshold: '4'
 ```
 
-<!-- ### Scan an image on a local controller -->
