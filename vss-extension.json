@@ -2,8 +2,9 @@
     "manifestVersion": 1,
     "id": "neuvector-vsts",
     "name": "NeuVector",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "NeuVector",
+    "public": true,
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
