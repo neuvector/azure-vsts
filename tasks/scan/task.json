@@ -8,9 +8,9 @@
     "category": "Test",
     "author": "NeuVector Inc.",
     "version": {
-        "Major": 0,
+        "Major": 1,
         "Minor": 0,
-        "Patch": 7
+        "Patch": 0
     },
     "instanceNameFormat": "Scan image",
     "groups": [

@@ -1,6 +1,6 @@
 {
   "name": "neuvector-vsts",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "description": "NeuVector extension for Azure DevOps Services",
   "main": "scan.js",
   "author": "NeuVector Inc.",

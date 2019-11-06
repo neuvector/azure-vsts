@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "neuvector-vsts",
     "name": "NeuVector",
-    "version": "0.0.8",
+    "version": "1.0.0",
     "publisher": "NeuVector",
     "targets": [
         {
