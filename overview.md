@@ -10,11 +10,11 @@ The extension provides the following features:
 
 * A **Scan image with NeuVector** task integrates the NeuVector vulnerability scanner into an Azure DevOps Pipeline.
 * Perform vulnerability scans of a container image after the image build
-  1. on an external NeuVector controller instance or
-  2. on a local NeuVector controller instance which is running in service container inside a pipeline.
+  1. on an external NeuVector scanner instance or
+  2. on a standalone NeuVector scanner instance which is running as a docker container inside a pipeline.
 * Define thresholds for failing builds based on the number of detected vulnerabilities of different severities.
 * Provide a detailed report of an image scan for analysis in the build summary tab.
-* External NeuVector controller instances are defined as service endpoints to decouple build pipeline definitions from connection parameters and credentials.
+* External NeuVector scanner instances are defined as service endpoints to decouple build pipeline definitions from connection parameters and credentials.
 
 ## Highlighted Features
 
@@ -22,15 +22,31 @@ The extension provides the following features:
 
 * Add the **Scan image with NeuVector** task to your Azure DevOps Pipeline to scan container images which have been built in the current pipeline for vulnerabilities.
 
-### Scan on external controller
+### Scan on external scanner
 
-* Perform scans on external NeuVector controller instances
+* Perform the registry scans on external NeuVector scanner instances
 
 ![NeuVector vulnerability scan task](screenshots/task-external-scan.png)
 
-### Scan on local pipeline controller
+###### external scanner instance `NeuVector on GKE`
 
-* Perform scans on a local NeuVector controller instance which is running in service container inside a pipeline
+* External scanner instances are defined as service connection
+* Connection parameters and credentials are configured only in the service connection
+* YAML-based pipeline definitions can reference the service connection to the external NeuVector scanner using an identifier
+
+![NeuVector controller service connection](screenshots/service-connection.png)
+
+### Scan on standalone scanner
+* A standalone scanner needs to pull the scanner image from a registry. It also needs a license to run the scan.
+
+![NeuVector vulnerability scan task](screenshots/task-standalone-scan.png)
+
+* Perform a registry scan
+
+![NeuVector vulnerability scan task](screenshots/task-registry-scan.png)
+
+
+* Perform a local image scan when the Container registry is empty
 
 ![NeuVector vulnerability scan task](screenshots/task-local-scan.png)
 
@@ -50,17 +66,77 @@ The **Scan image with NeuVector** task allows to define quality gates and thresh
 
 ![NeuVector vulnerability quality gates and thresholds](screenshots/task-thresholds.png)
 
-### Integrate with external NeuVector controller instances
-
-* External NeuVector controller instances are defined as service connection
-* Connection parameters and credentials are configured only in the service connection
-* YAML-based pipeline definitions can reference the service connection to the external NeuVector controller using an identifier
-
-![NeuVector controller service connection](screenshots/service-connection.png)
 
 ## Getting started
 
-### Scan an image in the pipeline on a local controller
+### Scan an registry on an external scanner
+
+1. Configure the connection parameters and credentials of the NeuVector scanner in a service connection
+
+    * Refer to [Create a service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection)
+    * In Azure DevOps, open the **Service connections** page from the project settings page.
+    * Choose **+ New service connection** and select **Remote NeuVector Scanner**
+    * Provide the URL, username and password to the scanner
+
+2. Add the **Scan image with NeuVector** task to your pipeline.
+
+    * The following shows a configuration of the `NeuVectorScan` task which scans the image `library/alpine` in Docker Hub on the NeuVector Scanner defined by the service connection with the name `NeuVector on AKS`.
+
+Example:
+
+```yaml
+- task: NeuVectorScan@2
+  displayName: Scan image with NeuVector
+  inputs:
+    scanType: 'external'
+    neuvectorScanner: 'NeuVector on AKS'
+    containerRegistry: 'Docker Hub'
+    repository: 'library/alpine'
+    tag: 'latest'
+    failOnHighSeverityThreshold: false
+    highSeverityThreshold: '2'
+    failOnMediumSeverityThreshold: false
+    mediumSeverityThreshold: '4'
+```
+
+### Scan an registry on a standalone scanner
+
+1. Configure the connection parameters and credentials of the NeuVector scanner in a service connection
+
+    * Refer to [Create a service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection)
+    * In Azure DevOps, open the **Service connections** page from the project settings page.
+    * Choose **+ New service connection** and select **Docker Registry**
+    * Choose the Registry type and provide according parameters to pull the NeuVector scanner image
+
+    ![NeuVector vulnerability report in build summary](screenshots/service-connection-registry.png)
+
+2. Add the **Scan image with NeuVector** task to your pipeline.
+
+    * The following shows a configuration of the `NeuVectorScan` task which scans the image `library/alpine` in Docker Hub on the NeuVector Scanner
+
+Example:
+
+![NeuVector vulnerability report in build summary](screenshots/task-standalone-registry-scan.png)
+
+```yaml
+- task: NeuVectorScan@2
+  displayName: Scan image with NeuVector
+  inputs:
+    scanType: 'standalone'
+    license: '$(neuvectorLicense.secureFilePath)'
+    nvContainerRegistry: 'NeuVector Registry on Docker'
+    nvRepository: 'neuvector/scanner'
+    nvTag: 'latest'
+    containerRegistry: 'Docker Hub'
+    repository: 'library/alpine'
+    tag: 'latest'
+    failOnHighSeverityThreshold: false
+    highSeverityThreshold: '2'
+    failOnMediumSeverityThreshold: false
+    mediumSeverityThreshold: '4'
+```
+
+### Scan a local image on a standalone scanner
 
 The following example shows a YAML-based pipeline, which
 
@@ -69,7 +145,7 @@ The following example shows a YAML-based pipeline, which
 * Fails the build if the image contains at least 1 high severity vulnerability or at least 3 medium severity vulnerabilities
 * Pushes the Docker image to a private Azure Container registry only if the aforementioned quality gates are met
 
-The pipeline starts a NeuVector controller as a [service container](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/service-containers?view=azure-devops&tabs=yaml). The task `NeuVectorScan` connects to the NeuVector controller running in the service container to perform scanning. As a prerequisite, a valid NeuVector license needs to be applied. In the example, the license is taken from the [secure file](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops) `neuvector-license.txt` and referenced by the `NeuVectorScan` step.
+The pipeline pulls the standalone image from a registry and run it in the pipeline as a container to perform scanning. The task `NeuVectorScan` is running in the pipeline to perform scanning. As a prerequisite, a valid NeuVector license needs to be applied. In the example, the license is taken from the [secure file](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops) `neuvector-license.txt` and referenced by the `NeuVectorScan` step.
 
 The example assumes:
 
@@ -79,9 +155,9 @@ The example assumes:
 
 Example:
 
+![NeuVector vulnerability report in build summary](screenshots/task-standalone-local-scan.png)
+
 ```yaml
-services:
-  neuvector: neuvector
 
 steps:
 - task: Docker@2
@@ -98,12 +174,14 @@ steps:
   displayName: Get NeuVector license
   inputs:
     secureFile: 'neuvector-license.txt'
-- task: NeuVectorScan@1
+- task: NeuVectorScan@2
   displayName: Scan image with NeuVector
   inputs:
-    controllerType: local
-    controllerPort: 10443
-    controllerLicense: '$(neuvectorLicense.secureFilePath)'
+    scanType: 'standalone'
+    license: '$(neuvectorLicense.secureFilePath)'
+    nvContainerRegistry: 'NeuVector registry on Docker'
+    nvRepository: 'neuvector/scanner'
+    nvTag: 'latest'
     repository: 'backend'
     tags: '$(Build.BuildId)'
     failOnHighSeverityThreshold: true
@@ -121,53 +199,6 @@ steps:
     repository: 'backend'
     tags: '$(Build.BuildId)'
 
-resources:
-  containers:
-  - container: neuvector
-    image: neuvector/controller:3.0.0.b3
-    endpoint: 'Docker Hub'
-    ports:
-      - 18300:18300
-      - 18301:18301
-      - 18400:18400
-      - 18401:18401
-      - 10443:10443
-    volumes:
-      - /lib/modules:/lib/modules
-      - /var/neuvector:/var/neuvector
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /sys/fs/cgroup:/host/cgroup
-      - /proc:/host/proc
-    options: --pid=host --cap-add=SYS_ADMIN --cap-add=NET_ADMIN --cap-add=SYS_PTRACE --cap-add=IPC_LOCK --security-opt apparmor:unconfined --env CLUSTER_JOIN_ADDR=neuvector --env CTRL_SERVER_PORT=10443
 ```
 
-### Scan an image on an external NeuVector controller
-
-1. Configure the connection parameters and credentials of the NeuVector controller in a service connection
-
-    * Refer to [Create a service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection)
-    * In Azure DevOps, open the **Service connections** page from the project settings page.
-    * Choose **+ New service connection** and select **NeuVector Controller**
-    * Provide the URL, username and password to the controller
-
-2. Add the **Scan image with NeuVector** task to your pipeline.
-
-    * The following shows a configuration of the `NeuVectorScan` task which scans the image `library/alpine` in Docker Hub on the NeuVector controller defined by the service connection with the name `NeuVector on AKS`.
-
-Example:
-
-```yaml
-- task: NeuVectorScan@1
-  displayName: Scan image with NeuVector
-  inputs:
-    controllerType: external
-    neuvectorController: 'NeuVector on AKS'
-    containerRegistry: 'Docker Hub'
-    repository: 'library/alpine'
-    tag: 'latest'
-    failOnHighSeverityThreshold: false
-    highSeverityThreshold: '2'
-    failOnMediumSeverityThreshold: false
-    mediumSeverityThreshold: '4'
-```
 

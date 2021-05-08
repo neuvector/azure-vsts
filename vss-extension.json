@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "neuvector-vsts",
     "name": "NeuVector",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "publisher": "NeuVector",
     "public": true,
     "targets": [
@@ -69,24 +69,24 @@
             }
         },
         {
-            "id": "neuvectorControllerServiceEndpoint",
+            "id": "neuvectorScannerServiceEndpoint",
             "type": "ms.vss-endpoint.service-endpoint-type",
             "targets": [
                 "ms.vss-endpoint.endpoint-types"
             ],
             "properties": {
-                "name": "neuvectorController",
-                "displayName": "NeuVector Controller",
-                "icon": "images/neuvector-controller-endpoint.png",
+                "name": "neuvectorScanner",
+                "displayName": "Remote NeuVector Scanner",
+                "icon": "images/neuvector-scanner-endpoint.png",
                 "url": {
-                    "displayName": "NeuVector Controller API URL",
-                    "helpText": "URL to the NeuVector Controller API "
+                    "displayName": "NeuVector Scanner API URL",
+                    "helpText": "URL to the NeuVector Scanner API "
                 },
                 "inputDescriptors":[
                     {
                         "id": "acceptUntrustedCerts",
                         "name": "Accept untrusted SSL certificates",
-                        "description": "Accept self-signed SSL server certificates when connecting to a NeuVector controller. This NOT be used in production scenarios.",
+                        "description": "Accept self-signed SSL server certificates when connecting to a NeuVector scanner. This NOT be used in production scenarios.",
                         "type": null,
                         "properties": null,
                         "inputMode": "checkBox",
@@ -106,7 +106,7 @@
                             {
                                 "id": "username",
                                 "name": "NeuVector Username",
-                                "description": "Username to access the NeuVector Controller API",
+                                "description": "Username to access the NeuVector Scanner API",
                                 "inputMode": "textbox",
                                 "validation": {
                                     "isRequired": true,
@@ -116,7 +116,7 @@
                             {
                                 "id": "password",
                                 "name": "NeuVector Password",
-                                "description": "Password to access the NeuVector Controller API",
+                                "description": "Password to access the NeuVector Scanner API",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {

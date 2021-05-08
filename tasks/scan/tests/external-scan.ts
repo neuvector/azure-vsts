@@ -11,18 +11,18 @@ let externalScanTestDir: string = path.join(__dirname, 'external-scan');
 
 process.env['BUILD_ARTIFACTSTAGINGDIRECTORY'] = `${tempDir}`;
 
-tmr.setInput('controllerType', 'external');
+tmr.setInput('scanType', 'external');
 
-tmr.setInput('neuvectorController', 'testNeuvectorController');
+tmr.setInput('neuvectorScanner', 'testNeuvectorScanner');
 
-let controllerJson = fs.readFileSync(`${externalScanTestDir}/controller.json`).toString();
-let controller = JSON.parse(controllerJson);
+let scannerJson = fs.readFileSync(`${externalScanTestDir}/scanner.json`).toString();
+let scanner = JSON.parse(scannerJson);
 
-process.env['ENDPOINT_URL_testNeuvectorController'] = controller.url;
-process.env['ENDPOINT_AUTH_SCHEME_testNeuvectorController'] = 'usernamepassword';
-process.env['ENDPOINT_AUTH_PARAMETER_testNeuvectorController_USERNAME'] = controller.username;
-process.env['ENDPOINT_AUTH_PARAMETER_testNeuvectorController_PASSWORD'] = controller.password;
-process.env['ENDPOINT_DATA_testNeuvectorController_ACCEPTUNTRUSTEDCERTS'] = controller.insecure;
+process.env['ENDPOINT_URL_testNeuvectorScanner'] = scanner.url;
+process.env['ENDPOINT_AUTH_SCHEME_testNeuvectorScanner'] = 'usernamepassword';
+process.env['ENDPOINT_AUTH_PARAMETER_testNeuvectorScanner_USERNAME'] = scanner.username;
+process.env['ENDPOINT_AUTH_PARAMETER_testNeuvectorScanner_PASSWORD'] = scanner.password;
+process.env['ENDPOINT_DATA_testNeuvectorScanner_ACCEPTUNTRUSTEDCERTS'] = scanner.insecure;
 
 tmr.setInput('containerRegistry', 'testContainerRegistry');
 

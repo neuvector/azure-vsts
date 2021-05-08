@@ -10,10 +10,12 @@ let localScanTestDir: string = path.join(__dirname, 'local-scan');
 
 process.env['BUILD_ARTIFACTSTAGINGDIRECTORY'] = `${tempDir}`;
 
-tmr.setInput('controllerType', 'local');
+tmr.setInput('scanType', 'standalone');
 
-tmr.setInput('controllerLicense', `${localScanTestDir}/neuvector-license.txt`);
-tmr.setInput('controllerPort', '10443');
+tmr.setInput('license', `${localScanTestDir}/neuvector-license.txt`);
+tmr.setInput('nvContainerRegistry', 'NeuVector registry on Docker');
+tmr.setInput('nvRepository', 'neuvector/scanner');
+tmr.setInput('nvTag', 'latest');
 
 tmr.setInput('repository', 'library/alpine');
 tmr.setInput('tag', 'latest');

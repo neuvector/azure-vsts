@@ -31,4 +31,9 @@ yarn-debug.log*
 /.env
 /incubator
 /TASKS.md
+package-lock.json
 
+# Default ignored files
+/shelf/
+/workspace.xml
+.idea
