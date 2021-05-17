@@ -183,7 +183,7 @@ steps:
     nvRepository: 'neuvector/scanner'
     nvTag: 'latest'
     repository: 'backend'
-    tags: '$(Build.BuildId)'
+    tag: '$(Build.BuildId)'
     failOnHighSeverityThreshold: true
     highSeverityThreshold: '1'
     failOnMediumSeverityThreshold: true
