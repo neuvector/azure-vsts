@@ -440,7 +440,7 @@ async function run() {
                     // Scan repository in external registry
                     scanRepositoryResponse = await nvClient.scanRepository(registryUrl, registryUsername, registryPassword, repository, tag, true);
 
-                    console.dir(scanRepositoryResponse);
+                    // console.dir(scanRepositoryResponse);
 
                     report = scanRepositoryResponse.report;
 
