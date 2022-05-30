@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "neuvector-vsts",
     "name": "NeuVector",
-    "version": "2.0.3",
+    "version": "3.0.1",
     "publisher": "NeuVector",
     "public": true,
     "targets": [
@@ -21,9 +21,6 @@
     "content": {
         "details": {
             "path": "overview.md"
-        },
-        "license": {
-            "path": "license.md"
         }
     },
     "links": {

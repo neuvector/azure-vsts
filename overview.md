@@ -37,7 +37,7 @@ The extension provides the following features:
 ![NeuVector controller service connection](screenshots/service-connection.png)
 
 ### Scan on standalone scanner
-* A standalone scanner needs to pull the scanner image from a registry. It also needs a license to run the scan.
+* A standalone scanner needs to pull the scanner image from a registry.
 
 ![NeuVector vulnerability scan task](screenshots/task-standalone-scan.png)
 
@@ -123,7 +123,6 @@ Example:
   displayName: Scan image with NeuVector
   inputs:
     scanType: 'standalone'
-    license: '$(neuvectorLicense.secureFilePath)'
     nvContainerRegistry: 'NeuVector Registry on Docker'
     nvRepository: 'neuvector/scanner'
     nvTag: 'latest'
@@ -145,12 +144,11 @@ The following example shows a YAML-based pipeline, which
 * Fails the build if the image contains at least 1 high severity vulnerability or at least 3 medium severity vulnerabilities
 * Pushes the Docker image to a private Azure Container registry only if the aforementioned quality gates are met
 
-The pipeline pulls the standalone image from a registry and run it in the pipeline as a container to perform scanning. The task `NeuVectorScan` is running in the pipeline to perform scanning. As a prerequisite, a valid NeuVector license needs to be applied. In the example, the license is taken from the [secure file](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops) `neuvector-license.txt` and referenced by the `NeuVectorScan` step.
+The pipeline pulls the standalone image from a registry and run it in the pipeline as a container to perform scanning. The task `NeuVectorScan` is running in the pipeline to perform scanning.
 
 The example assumes:
 
 * A [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml) `Docker Hub` is configured with credentials and permissions to fetch images from the NeuVector registry.
-* A valid NeuVector license exists in the [secure file](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops) `neuvector-license.txt` and is accessible by the pipeline.
 * A service connection to an Azure Container Registry `gallery.azurecr.io` is configured.
 
 Example:
@@ -169,16 +167,10 @@ steps:
       repository: 'backend'
       tags: '$(Build.BuildId)'
       addPipelineData: false
-- task: DownloadSecureFile@1
-  name: neuvectorLicense
-  displayName: Get NeuVector license
-  inputs:
-    secureFile: 'neuvector-license.txt'
 - task: NeuVectorScan@2
   displayName: Scan image with NeuVector
   inputs:
     scanType: 'standalone'
-    license: '$(neuvectorLicense.secureFilePath)'
     nvContainerRegistry: 'NeuVector registry on Docker'
     nvRepository: 'neuvector/scanner'
     nvTag: 'latest'

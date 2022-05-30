@@ -43,12 +43,6 @@ class NeuVectorApiClient {
 
     private readonly scanRepositoryEndpoint = "/v1/scan/repository"
 
-    // private readonly licenseEndpoint = "/v1/system/license"
-
-    // private readonly updateLicenseEndpoint = "/v1/system/license/update"
-
-    // private readonly authTokenHeader = "X-Auth-Token"
-
     private token = ""
 
     constructor(private readonly url: string, private readonly strictSsl: boolean) {
@@ -142,31 +136,6 @@ class NeuVectorApiClient {
             strictSSL: this.strictSsl
         });
     }
-
-    // public async getLicense() {
-    //     return await request.get({
-    //         baseUrl: this.url,
-    //         uri: this.licenseEndpoint,
-    //         json: true,
-    //         headers: this.getHeaders(),
-    //         strictSSL: this.strictSsl
-    //     });
-    // }
-
-    // public async updateLicense(licenseKey: string) {
-    //     const requestBody = {
-    //         "license_key": licenseKey
-    //     };
-
-    //     return await request.post({
-    //         baseUrl: this.url,
-    //         uri: this.updateLicenseEndpoint,
-    //         json: true,
-    //         body: requestBody,
-    //         headers: this.getHeaders(),
-    //         strictSSL: this.strictSsl
-    //     });
-    // }
 
     public async unauthenticate() {
         return await request.delete({
@@ -277,7 +246,6 @@ async function run() {
 
         if(standaloneScanner){
             // Standalone Scan
-            let license = "";
 
             let nvRegistry = false
             let nvRegistryUrl = "";
@@ -325,15 +293,6 @@ async function run() {
             nvRepository = tl.getInput('nvRepository', true)!;
             nvTag = tl.getInput('nvTag', true)!;
 
-            // License path
-            const licensePath: string = tl.getInput('license', true)!;
-
-            if (!fs.existsSync(licensePath)) {
-                tl.setResult(tl.TaskResult.Failed, `License file not found at "${licensePath}".`);
-            }
-
-            license = fs.readFileSync(licensePath).toString().trim();
-
             try {
                 let failOnStderr:boolean = false;
                 let mountPath = tl.getVariable('Pipeline.Workspace');
@@ -350,7 +309,7 @@ async function run() {
                 let script: string = `
                 echo ${nvRegistryPassword} | docker login -u ${nvRegistryUsername} --password-stdin ${nvRegistryUrl} \n
                 docker pull ${nvRegistryUrlParam}${nvRepository}:${nvTag} \n
-                docker run --name ${scannerName} --rm ${scannerRegistryUrlParam} ${scannerRegistryUserParam} ${scannerRegistryPasswordParam} -e SCANNER_REPOSITORY=${repository} -e SCANNER_TAG=${tag} -e SCANNER_LICENSE=${license} -v /var/run/docker.sock:/var/run/docker.sock -v ${mountPath}:/var/neuvector ${scanLayerParam} ${nvRegistryUrlParam}${nvRepository}:${nvTag} \n
+                docker run --name ${scannerName} --rm ${scannerRegistryUrlParam} ${scannerRegistryUserParam} ${scannerRegistryPasswordParam} -e SCANNER_REPOSITORY=${repository} -e SCANNER_TAG=${tag} -e SCANNER_ON_DEMAND=true -v /var/run/docker.sock:/var/run/docker.sock -v ${mountPath}:/var/neuvector ${scanLayerParam} ${nvRegistryUrlParam}${nvRepository}:${nvTag} \n
                 docker logout \n
                 docker images
                 `;

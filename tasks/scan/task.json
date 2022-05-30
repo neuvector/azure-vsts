@@ -8,7 +8,7 @@
     "category": "Test",
     "author": "NeuVector Inc.",
     "version": {
-        "Major": 2,
+        "Major": 3,
         "Minor": 0,
         "Patch": 1
     },
@@ -65,15 +65,6 @@
             "required": true,
             "visibleRule": "scanType = external",
             "helpMarkDown": "Select the service endpoint of the NeuVector Scanner which will perform the scan. To create an endpoint, click the Manage link and create a new NeuVector scanner service endpoint."
-        },
-        {
-            "name": "license",
-            "type": "string",
-            "label": "License",
-            "defaultValue": "",
-            "required": false,
-            "visibleRule": "scanType = standalone",
-            "helpMarkDown": "Path to the license file to apply to the local NeuVector scanner. Example: `$(Agent.TempDirectory)/neuvector-license.txt`."
         },
         {
             "name": "nvContainerRegistry",

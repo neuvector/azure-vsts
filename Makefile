@@ -85,7 +85,6 @@ test-package:
 DIST_INCLUDE_PATTERNS = \
 	/vss-extension.json \
 	/overview.md \
-	/license.md \
 	/images \
 	/images/*.png \
 	/screenshots \
