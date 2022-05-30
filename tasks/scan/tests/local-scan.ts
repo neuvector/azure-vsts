@@ -12,7 +12,6 @@ process.env['BUILD_ARTIFACTSTAGINGDIRECTORY'] = `${tempDir}`;
 
 tmr.setInput('scanType', 'standalone');
 
-tmr.setInput('license', `${localScanTestDir}/neuvector-license.txt`);
 tmr.setInput('nvContainerRegistry', 'NeuVector registry on Docker');
 tmr.setInput('nvRepository', 'neuvector/scanner');
 tmr.setInput('nvTag', 'latest');
