@@ -85,7 +85,7 @@ The **Scan image with NeuVector** task allows to define quality gates and thresh
 Example:
 
 ```yaml
-- task: NeuVectorScan@2
+- task: NeuVectorScan@3
   displayName: Scan image with NeuVector
   inputs:
     scanType: 'external'
@@ -119,7 +119,7 @@ Example:
 ![NeuVector vulnerability report in build summary](screenshots/task-standalone-registry-scan.png)
 
 ```yaml
-- task: NeuVectorScan@2
+- task: NeuVectorScan@3
   displayName: Scan image with NeuVector
   inputs:
     scanType: 'standalone'
@@ -167,7 +167,7 @@ steps:
       repository: 'backend'
       tags: '$(Build.BuildId)'
       addPipelineData: false
-- task: NeuVectorScan@2
+- task: NeuVectorScan@3
   displayName: Scan image with NeuVector
   inputs:
     scanType: 'standalone'

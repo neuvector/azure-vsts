@@ -15,11 +15,6 @@
     "instanceNameFormat": "Scan image",
     "groups": [
         {
-            "name": "nvImage",
-            "displayName": "NeuVector Standalone Scanner Image",
-            "isExpanded": true
-        },
-        {
             "name": "image",
             "displayName": "Image to scan",
             "isExpanded": true
@@ -69,18 +64,16 @@
         {
             "name": "nvContainerRegistry",
             "type": "connectedService:dockerregistry",
-            "label": "Registry",
-            "groupName": "nvImage",
+            "label": "NeuVector Scanner Registry",
             "defaultValue": "",
             "required": true,
             "visibleRule": "scanType = standalone",
-            "helpMarkDown": "Select a Docker registry which contains the NeuVector scanner image."
+            "helpMarkDown": "the registry where to pull the NeuVector scanner image "
         },
         {
             "name": "nvRepository",
             "type": "string",
-            "label": "Repository",
-            "groupName": "nvImage",
+            "label": "NeuVector Scanner Repository",
             "defaultValue": "neuvector/scanner",
             "required": true,
             "visibleRule": "scanType = standalone",
@@ -89,8 +82,7 @@
         {
             "name": "nvTag",
             "type": "string",
-            "label": "Tag",
-            "groupName": "nvImage",
+            "label": "NeuVector Scanner Tag",
             "defaultValue": "latest",
             "required": true,
             "visibleRule": "scanType = standalone",
