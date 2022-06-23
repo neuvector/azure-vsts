@@ -501,11 +501,11 @@ async function run() {
         mdReport += '### Vulnerabilities\n\n';
 
         if (report.vulnerabilities && report.vulnerabilities.length > 0) {
-            mdReport += 'Score | Name | Severity | Package name | Package version | Fixed version | Vectors | Description \n';
-            mdReport += '--- | --- | --- | --- | --- | --- | --- | ---\n';
+            mdReport += 'Score | Score(v3) | Name | Severity | Package name | Package version | Fixed version | Vectors | Vectors(v3) | Description \n';
+            mdReport += '--- | --- | --- | --- | --- | --- | --- | --- | --- | ---\n';
 
             for (let vulnerability of report.vulnerabilities) {
-                mdReport += `${vulnerability.score} | [${vulnerability.name}](${vulnerability.link}) | ${vulnerability.severity} | ${vulnerability.package_name} | ${vulnerability.package_version} | ${vulnerability.fixed_version} | ${vulnerability.vectors} | ${vulnerability.description}\n`;
+                mdReport += `${vulnerability.score} | ${vulnerability.score_v3} | [${vulnerability.name}](${vulnerability.link}) | ${vulnerability.severity} | ${vulnerability.package_name} | ${vulnerability.package_version} | ${vulnerability.fixed_version} | ${vulnerability.vectors} | ${vulnerability.vectors_v3} | ${vulnerability.description}\n`;
             }
         }
         else {
