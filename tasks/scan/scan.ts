@@ -309,9 +309,10 @@ async function run() {
                 let script: string = `
                 echo ${nvRegistryPassword} | docker login -u ${nvRegistryUsername} --password-stdin ${nvRegistryUrl} \n
                 docker pull ${nvRegistryUrlParam}${nvRepository}:${nvTag} \n
-                docker run --name ${scannerName} --rm ${scannerRegistryUrlParam} ${scannerRegistryUserParam} ${scannerRegistryPasswordParam} -e SCANNER_REPOSITORY=${repository} -e SCANNER_TAG=${tag} -e SCANNER_ON_DEMAND=true -v /var/run/docker.sock:/var/run/docker.sock -v ${mountPath}:/var/neuvector ${scanLayerParam} ${nvRegistryUrlParam}${nvRepository}:${nvTag} \n
-                docker logout \n
-                docker images
+                docker run --name ${scannerName} ${scannerRegistryUrlParam} ${scannerRegistryUserParam} ${scannerRegistryPasswordParam} -e SCANNER_REPOSITORY=${repository} -e SCANNER_TAG=${tag} -e SCANNER_ON_DEMAND=true -v /var/run/docker.sock:/var/run/docker.sock ${scanLayerParam} ${nvRegistryUrlParam}${nvRepository}:${nvTag} \n
+                docker cp ${scannerName}:/var/neuvector/scan_result.json ${mountPath} \n
+                docker rm ${scannerName} \n
+                docker logout
                 `;
 
                 // console.log("script:"+script);
